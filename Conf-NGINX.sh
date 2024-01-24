@@ -11,7 +11,7 @@ echo 'server {
     } # managed by Certbot
  
  
-    if ($host = nginxequipo3.duckdns.org) {
+    if ($host = failchat.duckdns.org) {
 
         return 301 https://$host$request_uri;
 
@@ -71,4 +71,4 @@ client_max_body_size 10M;
 
 }
 
-}' | sudo tee /etc/nginx/sites-available/nginxequipo3
+}' | sudo tee /etc/nginx/sites-available/failchat.duckdns.org
