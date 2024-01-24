@@ -16,12 +16,9 @@
 #
 # NOTES
 #   VERSION:   0.1.0
-#   LASTEDIT:  03/18/2017
-#   AUTHOR:    Joe Arauzo
-#   EMAIL:     joe@arauzo.net
-#   REVISIONS:
-#       0.1.0  03/18/2017 - first release
-#       0.0.1  02/25/2017 - work in progress
+#   LASTEDIT:  024/01/2024
+#   AUTHOR:    Gema Fernández
+#   EMAIL:     gfernandezg06@educantabria.es
 #
 #==============================================================================
 #   MODIFY THE SETTINGS BELOW
