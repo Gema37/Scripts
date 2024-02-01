@@ -1,0 +1,63 @@
+services:
+  traefik:
+    image: "traefik:latest"
+    restart: "unless-stopped"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./data/traefik/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./data/traefik/config:/config:ro"
+      - "./data/traefik/acme.json:/acme.json"
+    # The following labels are optional. If you keep them, you will be able to
+    # access Traefik dashboard via https://traefik.example.com/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.xquintero-docker.duckdns.org`)"
+      - "traefik.http.routers.traefik.entrypoints=web-secure"
+      - "traefik.http.routers.traefik.tls.certresolver=letsencrypt"
+  postgres:
+    image: docker.io/postgres:12-alpine
+    restart: "unless-stopped"
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_INITDB_ARGS=--encoding='UTF8' --lc-collate='C' --lc-ctype='C'
+    volumes:
+      - "./data/postgres/data:/var/lib/postgresql/data"
+    labels:
+      - "traefik.enable=false"
+  redis:
+    image: "redis:latest"
+    restart: "unless-stopped"
+  synapse:
+    image: "matrixdotorg/synapse:latest"
+    restart: "unless-stopped"
+    environment:
+      SYNAPSE_CONFIG_DIR: "/data"
+      SYNAPSE_CONFIG_PATH: "/data/homeserver.yaml"
+      UID: "1000"
+      GID: "1000"
+      TZ: "Europe/London"
+    volumes:
+      - "./data/matrix/synapse:/data"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.synapse.loadbalancer.server.port=8008"
+      - "traefik.http.routers.synapse.rule=Host(`synapse.xquintero-docker.duckdns.org`)"
+      - "traefik.http.routers.synapse.entrypoints=web-secure"
+      - "traefik.http.routers.synapse.tls.certresolver=letsencrypt"
+  nginx:
+    image: "nginx:latest"
+    restart: "unless-stopped"
+    volumes:
+      - "./data/matrix/nginx/matrix.conf:/etc/nginx/conf.d/matrix.conf"
+      - ./data/matrix/nginx/www:/var/www/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.matrix.loadbalancer.server.port=80"
+      - "traefik.http.routers.matrix.rule=Host(`matrix.xquintero-docker.duckdns.org`)"
+      - "traefik.http.routers.matrix.entrypoints=web-secure"
+      - "traefik.http.routers.matrix.tls.certresolver=letsencrypt"
